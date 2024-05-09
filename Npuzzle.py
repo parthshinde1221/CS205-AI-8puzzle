@@ -137,10 +137,7 @@ def heursitic_cost(curr_state,goal_state,n,distance_metric='UCS'):
 
         cost = 0
         for i in range(n*n):
-            x_curr,y_curr = find_2D_index(curr_state,curr_state[i],n)
-            x_goal,y_goal = find_2D_index(goal_state,curr_state[i],n)
-
-            if curr_state[i]!='0' and (x_curr!=x_goal or y_goal!=y_curr):
+            if curr_state[i] != '0' and curr_state[i] != goal_state[i]:
                 cost += 1
         
         # print(cost)
@@ -209,8 +206,10 @@ class Searcher:
                 if state not in self.visited:
                     # Calculate total cost and create a new child node
                     child_node = Node(state, current_node, action, current_node.path_cost + 1 + heursitic_cost(current_node.state, goal_state, n, distance_metric=distance_metric))
-                    if current_node.path == current_node.path_cost:
-                        continue  
+                    
+                    if current_node.path_cost == child_node.path_cost:
+                        continue
+
                     heapq.heappush(self.frontier, (child_node.path_cost, child_node))  # Queueing function based on cost
                     self.visited.add(state)
 
