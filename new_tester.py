@@ -1,6 +1,7 @@
 from Npuzzle import *
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
+import pandas as pd
 # from time import time
 
 # global variables
@@ -46,7 +47,7 @@ class TestCase:
         print(f'TIME TAKEN FOR SEARCH EXECUTION: {(end_time - start_time) * 1000} ms')    
 
         self.execution_time = (end_time - start_time) * 1000
-        self.depth_of_tree = len(path)
+        self.depth_of_tree = len(path) -1 
         self.nodes_frontier_count = len(search_obj.frontier)
         self.nodes_visited_count = len(search_obj.visited)
 
@@ -65,6 +66,7 @@ class GraphGenerator:
         with PdfPages('n_puzzle_analysis.pdf') as pdf:
             # Prepare data
             data = {method: {'execution_times': [], 'depths': [], 'visited_counts': [], 'frontier_counts': [], 'outcomes': []} for method in HEURISTIC_METHODS}
+            # data[]
             
             for test_case in self.test_case_objects:
                 method_data = data[test_case.heuristic_method]
@@ -74,10 +76,14 @@ class GraphGenerator:
                 method_data['frontier_counts'].append(test_case.nodes_frontier_count)
                 method_data['outcomes'].append(test_case.result)
 
+            # print(data)
             # Generate plots
             self.plot_graphs(data, pdf)
 
     def plot_graphs(self, data, pdf):
+        max_depth = max(max(test_case.depth_of_tree for test_case in self.test_case_objects), 30)
+        depth_ticks = range(0, max_depth + 1, 2)
+        
         # Execution Time vs Depth of Solution
         plt.figure(figsize=(10, 5))
         for method, method_data in data.items():
@@ -85,6 +91,7 @@ class GraphGenerator:
         plt.xlabel('Depth of Solution')
         plt.ylabel('Execution Time (ms)')
         plt.title('Execution Time vs Depth of Solution by Heuristic')
+        plt.xticks(depth_ticks)
         plt.legend()
         plt.grid(True)
         pdf.savefig()
@@ -97,6 +104,7 @@ class GraphGenerator:
         plt.xlabel('Depth of Solution')
         plt.ylabel('Nodes Visited')
         plt.title('Nodes Visited vs Depth of Solution by Heuristic')
+        plt.xticks(depth_ticks)
         plt.legend()
         plt.grid(True)
         pdf.savefig()
@@ -109,6 +117,7 @@ class GraphGenerator:
         plt.xlabel('Depth of Solution')
         plt.ylabel('Frontier Nodes Count')
         plt.title('Frontier Nodes vs Depth of Solution by Heuristic')
+        plt.xticks(depth_ticks)
         plt.legend()
         plt.grid(True)
         pdf.savefig()

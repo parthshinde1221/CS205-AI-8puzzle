@@ -1,45 +1,6 @@
-# import copy as cp
-
-# class Node:
-#     def __init__(self):
-#         pass
-#     def get_location(self):
-#         pass
-#     def move_up(self):
-#         pass
-#     def move_down(self):
-#         pass
-#     def move_right(self):
-#         pass
-#     def move_left(self):
-#         pass
-
-
-# class Problem:
-#     def __init__(self,init_state,goal_state):
-#         self.init_state = init_state
-#         self.goal_state = goal_state
-
-
-
-
-# def create_board(n):
-#     x = []
-#     for i in range(n):
-#         y = []
-#         for j in range(n):
-#             y.append(input('Enter value:\n'))
-#         x.append(y)
-#     return x
-
-
 import heapq
 from random import randrange
 from time import time
-
-
-# FRONTIER.append(2)
-# GOAL_STATE = '123456780'
 
 class Node:
     '''
@@ -94,8 +55,9 @@ def possible_moves(state, n):
     return moves
 
 # To check if the goal state has reached
-def goal_test(state, n):
-    return state == ''.join(str(i) for i in range(1, n*n)) + '0'
+def goal_test(state, goal_state):
+    # return state == ''.join(str(i) for i in range(1, n*n)) + '0'
+    return state == goal_state
 
 # retrace the path taken to reach the goal state
 def reconstruct_path(node):
@@ -160,27 +122,6 @@ class Searcher:
         self.frontier = []
         self.visited = set()
         # self.result = ''
-    
-    # def general_search(self,initial_state,goal_state,n,distance_metric):
-    #     initial_node = Node(initial_state)
-    #     # frontier = []
-    #     heapq.heappush(self.frontier, (initial_node.path_cost, initial_node))
-    #     # visited = set()
-
-    #     # goal_state = ''.join([i for i in range()])
-        
-    #     while self.frontier:
-    #         current_cost, current_node = heapq.heappop(self.frontier)
-    #         if goal_test(current_node.state, n):
-    #             # print(f"No of nodes:{len(self.frontier)}")
-    #             return reconstruct_path(current_node)
-
-    #         self.visited.add(current_node.state)
-    #         for state, action in possible_moves(current_node.state, n):
-    #             if state not in self.visited:
-    #                 child_node = Node(state, current_node, action, current_node.path_cost + 1 + heursitic_cost(current_node.state,goal_state,n,distance_metric=distance_metric))
-    #                 heapq.heappush(self.frontier, (child_node.path_cost, child_node))
-    #                 self.visited.add(state)
 
     def general_search(self, initial_state, goal_state, n, distance_metric):
 
@@ -188,16 +129,21 @@ class Searcher:
         initial_node = Node(initial_state)
         
         # nodes = MAKE-QUEUE(MAKE-NODE(problem.INITIAL-STATE))
-        heapq.heappush(self.frontier, (initial_node.path_cost, initial_node)) # Priority queue used here
+        heapq.heappush(self.frontier,initial_node) # Priority queue used here
         
         # loop do
-        while self.frontier:
+        while True:
+
+            # if EMPTY(nodes) then return "failure" 
+            if not self.frontier:
+                return 'failure'
             
             # node = REMOVE-FRONT(nodes)
-            current_cost, current_node = heapq.heappop(self.frontier)
+            current_node = heapq.heappop(self.frontier)
+            # print(current_node.path)
             
             # if problem.GOAL-TEST(node.STATE) succeeds then return node
-            if goal_test(current_node.state, n):  # Check if the current node is the goal state
+            if goal_test(current_node.state, goal_state):  # Check if the current node is the goal state
                 return reconstruct_path(current_node)  # Retrace path to this node if it's the goal
             
             # nodes = QUEUEING-FUNCTION(nodes, EXPAND(node, problem.OPERATORS))
@@ -206,17 +152,14 @@ class Searcher:
                 if state not in self.visited:
                     # Calculate total cost and create a new child node
                     child_node = Node(state, current_node, action, current_node.path_cost + 1 + heursitic_cost(current_node.state, goal_state, n, distance_metric=distance_metric))
-                    
-                    if current_node.path_cost == child_node.path_cost:
-                        continue
 
-                    heapq.heappush(self.frontier, (child_node.path_cost, child_node))  # Queueing function based on cost
+                    heapq.heappush(self.frontier,child_node) # Queueing function based on cost
                     self.visited.add(state)
 
         
-        # if EMPTY(nodes) then return "failure" 
+        
         # as it would come out of the while loop as soon as nodes i.e frontier becomes 0
-        return "failure"
+        # return "failure"
         
         
     
@@ -258,9 +201,6 @@ def main():
         return
 
     print('\n---SEARCHER INTIALISED---\n')
-    # print("FINDING PATH")
-    # while True:
-    #     print('.')
     search_obj = Searcher()
     start_time = time()
     path = search_obj.general_search(initial_state,goal_state,n,distance_metric_dict[cost_function_used])
